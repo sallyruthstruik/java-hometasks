@@ -179,7 +179,7 @@ public class Aggregator {
             worker.processFile(args[0]);
         }catch(IOException e){
             System.err.println("Can't open file: " + e.toString());
-        }
+        }   
     }
     
 }
