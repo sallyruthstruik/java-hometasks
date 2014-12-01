@@ -30,7 +30,7 @@ class Worker{
         
         if(!userActionsMap.containsKey(uid)){
             userActionsMap.put(uid, action);
-            userTimesMap.put(uid, duration);
+            userTimesMap.put(uid, -duration);
         }else{
             String lastAction = (String)userActionsMap.get(uid);
             if(lastAction.equals(action)){
@@ -38,7 +38,7 @@ class Worker{
                 System.exit(1);
             }else{
                 Long prevDuration = (Long)userTimesMap.get(uid);
-                userTimesMap.put(uid, prevDuration + duration);
+                userTimesMap.put(uid, prevDuration + (action.equals("login")?-1:1)*duration);
                 userActionsMap.put(uid, action);
             }
         }
