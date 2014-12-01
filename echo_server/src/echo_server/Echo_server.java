@@ -44,7 +44,7 @@ class SocketWorker implements Runnable{
         
     }
     
-    public void sendMessage(String msg){
+    synchronized public void sendMessage(String msg){
         out.println(msg);
         out.flush();
     }
@@ -63,9 +63,13 @@ class SocketWorker implements Runnable{
                     break;
                 }
                 
-                for(Object obj : workerMap.values().toArray()){
-                    
+                for(Object obj : workerMap.values()){
                     SocketWorker worker = (SocketWorker) obj;
+                    
+                    if(this.equals(worker)){
+                        continue;
+                    }
+                    
                     System.out.println("Send message to worker: "+worker.toString());
                     
                     worker.sendMessage(userInput);
