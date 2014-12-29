@@ -14,11 +14,18 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
+
 class Worker{
     //тут храним окончательный результат, по закрытым парам
     private static final Map userTimesMap = new HashMap();
     //тут храним последние встреченные события
     private static final Map userActionsMap = new HashMap();
+
+    Opener opener;
+    
+    public Worker(Opener opener) {
+        this.opener = opener;
+    }
     
     
     private void processOneRow(String row, Long lineno){
@@ -45,19 +52,11 @@ class Worker{
         
     }
     
-    public void processFile(String file) throws IOException{
+    public void process() throws IOException{
         //open file        
-        try(BufferedReader filestream = new BufferedReader(new FileReader(file))){
-            String curline;
-            
-            Long i = 0L;
-            while((curline=filestream.readLine())!=null){
-                i++;
-                processOneRow(curline, i);
-            }
-            
-        }catch(FileNotFoundException e){
-            System.err.println("File "+file + " not found");
+        long i=0L;
+        for(String line:opener){
+            processOneRow(line, i++);
         }
         
         printResults();
@@ -166,20 +165,14 @@ public class Aggregator {
     
     
     
-    public static void main(String[] args) {
-        if(args.length != 1){
-            System.err.println("File path as first argument is required");
-            System.exit(2);
-        }
-//        RandomDataGeneration gen = new RandomDataGeneration(10, 1000);
-//        gen.generate("test.txt");
+    public static void main(String [] args)throws IOException{
+        long start = System.currentTimeMillis();
         
-        Worker worker = new Worker();
-        try{    
-            worker.processFile(args[0]);
-        }catch(IOException e){
-            System.err.println("Can't open file: " + e.toString());
-        }   
+        try(Opener op = new MemoryMappedOpener("test.txt")){
+            new Worker(op).process();
+        }
+        
+        System.out.println("Execution time "+(System.currentTimeMillis() - start));
     }
     
 }
