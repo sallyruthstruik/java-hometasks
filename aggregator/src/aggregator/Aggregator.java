@@ -87,72 +87,6 @@ class Worker{
     }
 }
 
-class RandomDataGeneration{
-    
-    private Integer countUsers, countRows, curTime;
-    private ArrayList userIds = new ArrayList();
-    private Map lastEvents = new HashMap();
-    private static String [] Events = {"login", "logout"};
-    
-    public RandomDataGeneration(Integer countUsers, Integer countRows){
-        this.countUsers = countUsers;
-        this.countRows = countRows;
-        this.curTime = 1;
-        
-        generateIds();
-    }
-    
-    void generateIds(){
-        for(int i=0; i<countUsers; i++){
-            userIds.add(i+1);
-        }
-    }
-    
-    Integer getRandomId(){
-        int idx = new Random().nextInt(userIds.size());
-        return (Integer)userIds.get(idx);
-    }
-    
-    String getRandomEvent(Integer uid){
-        
-        if(!lastEvents.containsKey(uid)){
-            lastEvents.put(uid, "logout");
-        }
-        
-        String lastEvent = (String)lastEvents.get(uid);
-        
-        if(lastEvent.equals("login")){
-            lastEvents.put(uid, "logout");
-            return "logout";
-        }else{
-            lastEvents.put(uid, "login");
-            return "login";
-        }
-    }
-    
-    Integer getNextUnixTime(){
-        curTime = new Random().nextInt(1000) + curTime;
-        return curTime;
-    }
-    
-    public void generate(String outname){
-        try{
-            try(BufferedWriter writer = new BufferedWriter(new FileWriter(outname))){
-                for(int i=0; i<countRows; i++){
-                    Integer uid = getRandomId();
-                    String event = getRandomEvent(uid);
-                    
-                    writer.write(getNextUnixTime().toString(
-                    ) + "," + uid.toString() + "," + event + "\n");
-                }
-            }
-        }catch(IOException e){
-            System.err.println("Can't open file for writing: "+e.toString());
-        }
-    }
-    
-}
-
 /**
  *
  * @author Станислав
@@ -162,17 +96,13 @@ public class Aggregator {
     /**
      * @param args the command line arguments
      */
-    
-    
-    
     public static void main(String [] args)throws IOException{
         long start = System.currentTimeMillis();
         
         try(Opener op = new MemoryMappedOpener("test.txt")){
             new Worker(op).process();
         }
-        
-        System.out.println("Execution time "+(System.currentTimeMillis() - start));
+        System.out.println("Execution time "+(System.currentTimeMillis() - start) + " ms");
     }
     
 }
